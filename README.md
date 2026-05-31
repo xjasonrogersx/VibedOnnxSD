@@ -89,6 +89,24 @@ vibed-onnx-sd \
   --model-repo onnx-community/stable-diffusion-v1-5-ONNX
 ```
 
+## Quantize a local model
+
+You can create an int8 copy of a downloaded model with:
+
+```bash
+python3 scripts/quantize_onnx_pipeline.py --force
+```
+
+By default this reads from the local downloaded model folder and writes a sibling `-int8` directory. You can also choose specific components:
+
+```bash
+python3 scripts/quantize_onnx_pipeline.py \
+  --components text_encoder vae_decoder \
+  --output-dir models/onnx-community--stable-diffusion-v1-5-ONNX-int8
+```
+
+The UNet is the most memory-intensive component to quantize. In a small container it may still be killed during quantization even when the text encoder and VAE succeed.
+
 ## Tests
 
 Run the full test suite:

@@ -128,6 +128,10 @@ class OnnxStableDiffusionPipeline:
                     )
                 ort_inputs[input_meta.name] = self._cast_input(value, input_meta.type)
 
+            LOGGER.info(
+                "Executing text encoder with input shapes: %s",
+                self._format_input_shapes(ort_inputs),
+            )
             embeddings = text_encoder.run(None, ort_inputs)[0]
             return np.asarray(embeddings, dtype=np.float32)
         finally:
@@ -154,6 +158,10 @@ class OnnxStableDiffusionPipeline:
                 raise ConfigurationError(f"Unsupported UNet input: {input_meta.name}")
             ort_inputs[input_meta.name] = self._cast_input(value, input_meta.type)
 
+        LOGGER.info(
+            "Executing UNet with input shapes: %s",
+            self._format_input_shapes(ort_inputs),
+        )
         result = unet.run(None, ort_inputs)[0]
         return np.asarray(result, dtype=np.float32)
 
@@ -170,6 +178,10 @@ class OnnxStableDiffusionPipeline:
                 scaled_latents, input_meta.type
             )
 
+        LOGGER.info(
+            "Executing VAE decoder with input shapes: %s",
+            self._format_input_shapes(ort_inputs),
+        )
         decoded = vae_decoder.run(None, ort_inputs)[0]
         del vae_decoder
         gc.collect()
@@ -229,6 +241,13 @@ class OnnxStableDiffusionPipeline:
             return 0.18215
         payload = json.loads(config_path.read_text(encoding="utf-8"))
         return float(payload.get("scaling_factor", 0.18215))
+
+    @staticmethod
+    def _format_input_shapes(ort_inputs: dict[str, np.ndarray]) -> str:
+        return ", ".join(
+            f"{name}={tuple(value.shape)}"
+            for name, value in ort_inputs.items()
+        )
 
     def _ensure_memory_budget(self) -> None:
         available_memory = self._read_available_memory_bytes()
