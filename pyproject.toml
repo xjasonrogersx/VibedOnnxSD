@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vibed-onnx-sd"
+version = "0.1.0"
+description = "CPU-only Stable Diffusion inference with ONNX Runtime."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "huggingface_hub>=0.23,<1",
+  "numpy>=1.26,<3",
+  "onnxruntime>=1.18,<2",
+  "Pillow>=10,<12",
+  "transformers>=4.41,<5",
+]
+
+[project.scripts]
+vibed-onnx-sd = "vibed_onnx_sd.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vibed_onnx_sd"]
