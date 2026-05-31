@@ -36,6 +36,10 @@ your-model/
 
 The default auto-download source is `onnx-community/stable-diffusion-v1-5-ONNX` on Hugging Face. Downloaded assets are stored under `./models/` unless `--cache-dir` is provided.
 
+## Memory expectations
+
+The default Stable Diffusion 1.5 ONNX model is large for CPU inference. In practice it needs roughly **6 GiB or more of available RAM** to load reliably with ONNX Runtime on CPU. If the environment is below that, the CLI now stops early with a clear configuration error instead of getting killed by the kernel during model load.
+
 ## Setup
 
 ```bash
